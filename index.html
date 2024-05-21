@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <!-- Define a codificação de caracteres como UTF-8 -->
+    <meta charset="UTF-8">
+    <!-- Configura a visualização para dispositivos variados -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Inclui a biblioteca ResponsiveVoice para síntese de voz -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+    <!-- Links para as fontes do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importa as fontes Chakra Petch e Inter para uso no documento -->
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Link para o arquivo CSS personalizado -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Título da página exibido na aba do navegador -->
+    <title>Game</title>
+</head>
+
+<body>
+    <!-- Conteúdo principal da página -->
+    <div class="container">
+        <div class="container__conteudo">
+            <div class="container__informacoes">
+                <!-- Texto principal e instruções do jogo -->
+                <div class="container__texto">
+                    <h1>Adivinhe o <span class="container__texto-azul">numero secreto</span></h1>
+                    <p class="texto__paragrafo">Escolha um número entre 1 a 10</p>
+                </div>
+                <!-- Input para o usuário inserir o palpite -->
+                <input type="number" min="1" max="10" class="container__input">
+                <!-- Botões para verificar o palpite e reiniciar o jogo -->
+                <div class="chute container__botoes">
+                    <button onclick="verificarChute()" class="container__botao">Chutar</button>
+                    <button onclick="reiniciarJogo()" id="reiniciar" class="container__botao" disabled>Novo jogo</button>
+                </div>
+            </div>
+            <!-- Imagem decorativa -->
+            <img src="ue.png" alt="personagem de jogo confuso" class="container__imagem-pessoa" />
+        </div>
+    </div>
+
+    <!-- Link para o arquivo JavaScript -->
+    <script>
+        let listaDeNumerosSorteados = [];
+        let numeroLimite = 10;
+        let numeroSecreto = gerarNumeroAleatorio();
+        let tentativas = 1;
+    
+        function exibirTextoNaTela(tag, texto) {
+            let campo = document.querySelector(tag);
+            campo.innerHTML = texto;
+            responsiveVoice.speak(texto, 'Brazilian Portuguese Female', {rate: 1.2});
+        }
+    
+        function exibirMensagemInicial() {
+            exibirTextoNaTela('h1', 'Jogo do número secreto');
+            exibirTextoNaTela('p', 'Escolha um número entre 1 e 10');
+        }
+    
+        exibirMensagemInicial();
+    
+        function verificarChute() {
+            let chute = document.querySelector('input').value;
+    
+            if (chute == numeroSecreto) {
+                exibirTextoNaTela('h1', 'Acertou!');
+                let palavraTentativa = tentativas > 1 ? 'tentativas' : 'tentativa';
+                let mensagemTentativas = `Você descobriu o número secreto com ${tentativas} ${palavraTentativa}!`;
+                exibirTextoNaTela('p', mensagemTentativas);
+                document.getElementById('reiniciar').removeAttribute('disabled');
+            } else {
+                if (chute > numeroSecreto) {
+                    exibirTextoNaTela('p', 'O número secreto é menor');
+                } else {
+                    exibirTextoNaTela('p', 'O número secreto é maior');
+                }
+                tentativas++;
+                limparCampo();
+            }
+        }
+    
+        function gerarNumeroAleatorio() {
+            let numeroEscolhido = parseInt(Math.random() * numeroLimite + 1);
+            let quantidadeDeElementosNaLista = listaDeNumerosSorteados.length;
+    
+            if (quantidadeDeElementosNaLista == numeroLimite) {
+                listaDeNumerosSorteados = [];
+            }
+            if (listaDeNumerosSorteados.includes(numeroEscolhido)){
+                return gerarNumeroAleatorio();
+            } else {
+                listaDeNumerosSorteados.push(numeroEscolhido);
+                console.log(listaDeNumerosSorteados);
+                return numeroEscolhido;
+            }
+        }
+    
+        function limparCampo() {
+            let chute = document.querySelector('input');
+            chute.value = '';
+        }
+    
+        function reiniciarJogo() {
+            numeroSecreto = gerarNumeroAleatorio();
+            limparCampo();
+            tentativas = 1;
+            exibirMensagemInicial();
+            document.getElementById('reiniciar').setAttribute('disabled', true);
+        }
+    </script>
+</body>
+
+</html>
